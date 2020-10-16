@@ -13,8 +13,12 @@ import qualified NetworkService
 
 import Data.Text (Text, pack, unpack)
 import Control.Concurrent.Async (waitCatch)
+import Data.Maybe (fromMaybe)
+import Data.IORef
 
+import Models
 import Utils
+import GameScreen
 
 showStartScreen :: IO ()
 showStartScreen = do
@@ -38,7 +42,9 @@ showStartScreen = do
       mSessionId <- waitCatch pSession
       doOnMainThread $ do
         case mSessionId of
-          Right sessionId -> putStrLn $ "ok: " ++ sessionId
+          Right sessionId -> do
+            showGameScreen sessionId
+            Gtk.windowClose window
           Left err -> putStrLn $ "err: " ++ show err
         Gtk.widgetSetSensitive startGameButton True
       return ()

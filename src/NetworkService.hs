@@ -1,6 +1,9 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module NetworkService where
 
 import Control.Concurrent (threadDelay)
+import Network.Wreq
 
 startGame :: IO String
 startGame = do

@@ -1,3 +1,3 @@
 module Models where
 
-data SessionState = SessionState { sessionId :: Maybe String }
+data SessionState = SessionState { stateSessionId :: Maybe String }

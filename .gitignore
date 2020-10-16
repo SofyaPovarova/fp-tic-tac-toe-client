@@ -33,3 +33,4 @@ tic-tac-toe
 .idea
 *.iml
 res/*.glade~
+res/#*#
