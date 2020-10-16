@@ -12,6 +12,7 @@ pkgs.stdenv.mkDerivation rec {
   buildInputs = [
     (pkgs.haskell.packages.ghc865.ghcWithPackages (p: [
       p.gi-gtk
+      p.wreq
     ]))
     pkgs.cabal-install
     pkgs.pkgconfig
