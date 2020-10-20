@@ -15,6 +15,7 @@ import Data.Text (Text, pack, unpack)
 import Control.Concurrent.Async (waitCatch)
 import Data.Maybe (fromMaybe)
 import Data.IORef
+import GHC.Float
 
 import Models
 import Utils
@@ -36,17 +37,37 @@ showStartScreen = do
   winLineLengthPicker <- builderGetObject Gtk.SpinButton builder "win-line-length-picker"
   startGameButton <- builderGetObject Gtk.Button builder "start-game-button"
 
+  roleRef <- newIORef $ PlayerRoleParam X
+
+  setChangeRollCallback buttonRoleCrosses (PlayerRoleParam X) roleRef
+  setChangeRollCallback buttonRoleNoughts (PlayerRoleParam O) roleRef
+  setChangeRollCallback buttonRoleRandom (PlayerRoleRandom) roleRef
+
   Gtk.onButtonClicked startGameButton $ do
     Gtk.widgetSetSensitive startGameButton False
-    asyncRequest NetworkService.startGame $ \pSession -> do
-      mSessionId <- waitCatch pSession
+    fieldSizeValue <- Gtk.spinButtonGetValue fieldSizePicker
+    role <- readIORef roleRef
+    winLineLengthValue <- Gtk.spinButtonGetValue winLineLengthPicker
+    let req = NetworkService.startGame (double2Int fieldSizeValue) role (double2Int winLineLengthValue)
+    asyncRequest req $ \aSession -> do
+      mSession <- waitCatch aSession
       doOnMainThread $ do
-        case mSessionId of
-          Right sessionId -> do
-            showGameScreen sessionId
+        case mSession of
+          Right (Right (sessionId, initialState)) -> do
+            showGameScreen sessionId initialState
             Gtk.windowClose window
+          Right (Left err) -> putStrLn $ "err: " ++ show err
           Left err -> putStrLn $ "err: " ++ show err
         Gtk.widgetSetSensitive startGameButton True
       return ()
 
   Gtk.widgetShowAll window
+
+setChangeRollCallback :: Gtk.RadioButton -> PlayerRoleParam -> IORef PlayerRoleParam -> IO ()
+setChangeRollCallback button role ref = do
+  _ <- Gtk.afterToggleButtonToggled button $ do
+    isButtonActive <- Gtk.toggleButtonGetActive button
+    if isButtonActive
+      then writeIORef ref role
+      else return ()
+  return ()
