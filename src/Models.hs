@@ -3,20 +3,17 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Models where
 
 import qualified Data.Map as Map
 
+import Lens.Micro.TH
 import GHC.Generics
 import Data.Aeson
 
 type SessionId = String
-
-data SessionState = SessionState 
-  { stateSessionId :: Maybe SessionId
-  , stateGameSession :: GameSession
-  }
 
 data PlayerRoleParam = PlayerRoleParam Cell | PlayerRoleRandom
 
@@ -65,26 +62,32 @@ toGameResult =
 
 
 data Field = Field
-  { fieldCells :: Map.Map (Int, Int) Cell
-  , fieldSize :: Int
+  { _fieldCells :: Map.Map (Int, Int) Cell
+  , _fieldSize :: Int
   } deriving (Show)
+
+makeLenses ''Field
 
 instance FromJSON Field where
   parseJSON = withObject "Field" $ \o -> do
-    fieldCells <- o .: "cells"
-    fieldSize <- o .: "size"
+    _fieldCells <- o .: "cells"
+    _fieldSize <- o .: "size"
     return Field{..}
 
 data GameSession = GameSession
-  { gsField :: Field
-  , gsPlayerRole :: Cell
-  , gsGameResult :: Maybe GameResult
-  } deriving (Show, Generic)
+  { _gsField :: Field
+  , _gsGameResult :: Maybe GameResult
+  } deriving (Show)
+
+makeLenses ''GameSession
 
 instance FromJSON GameSession where
   parseJSON = withObject "GameSession" $ \o -> do
-    gsField <- o .: "field"
-    gsPlayerRole <- o .: "playerRole"
-    gsGameResult <- o .: "gameResult"
+    _gsField <- o .: "field"
+    _gsGameResult <- o .: "gameResult"
     return GameSession{..}
     
+data SessionState = SessionState 
+  { stateSessionId :: Maybe SessionId
+  , stateGameSession :: GameSession
+  }

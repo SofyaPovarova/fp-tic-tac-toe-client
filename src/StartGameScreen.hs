@@ -39,9 +39,9 @@ showStartScreen = do
 
   roleRef <- newIORef $ PlayerRoleParam X
 
-  setChangeRollCallback buttonRoleCrosses (PlayerRoleParam X) roleRef
-  setChangeRollCallback buttonRoleNoughts (PlayerRoleParam O) roleRef
-  setChangeRollCallback buttonRoleRandom (PlayerRoleRandom) roleRef
+  setChangeRoleCallback buttonRoleCrosses (PlayerRoleParam X) roleRef
+  setChangeRoleCallback buttonRoleNoughts (PlayerRoleParam O) roleRef
+  setChangeRoleCallback buttonRoleRandom (PlayerRoleRandom) roleRef
 
   Gtk.onButtonClicked startGameButton $ do
     Gtk.widgetSetSensitive startGameButton False
@@ -63,8 +63,8 @@ showStartScreen = do
 
   Gtk.widgetShowAll window
 
-setChangeRollCallback :: Gtk.RadioButton -> PlayerRoleParam -> IORef PlayerRoleParam -> IO ()
-setChangeRollCallback button role ref = do
+setChangeRoleCallback :: Gtk.RadioButton -> PlayerRoleParam -> IORef PlayerRoleParam -> IO ()
+setChangeRoleCallback button role ref = do
   _ <- Gtk.afterToggleButtonToggled button $ do
     isButtonActive <- Gtk.toggleButtonGetActive button
     if isButtonActive

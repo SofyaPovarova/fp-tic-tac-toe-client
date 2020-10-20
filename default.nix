@@ -13,6 +13,8 @@ pkgs.stdenv.mkDerivation rec {
     (pkgs.haskell.packages.ghc865.ghcWithPackages (p: [
       p.gi-gtk
       p.wreq
+      p.microlens
+      p.microlens-th
     ]))
     pkgs.cabal-install
     pkgs.pkgconfig

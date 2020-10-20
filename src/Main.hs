@@ -8,4 +8,3 @@ main = do
   showStartScreen 
   Gtk.main
  
-
