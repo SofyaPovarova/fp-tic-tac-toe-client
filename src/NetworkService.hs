@@ -15,8 +15,8 @@ baseUrl :: String
 baseUrl = "http://localhost:8081"
 
 startGame :: Int -> PlayerRoleParam -> Int -> IO (Either String (SessionId, GameState))
-startGame fieldSize role winLineLength = do
-  let opts = defaults & param "fieldSize" .~ [pack $ show fieldSize] 
+startGame fieldSize' role winLineLength = do
+  let opts = defaults & param "fieldSize" .~ [pack $ show fieldSize']
                       & param "role" .~ [pack $ show role] 
                       & param "winLineLength" .~ [pack $ show winLineLength]
 

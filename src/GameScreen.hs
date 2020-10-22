@@ -7,18 +7,12 @@ module GameScreen
   ) where
 
 import qualified GI.Gtk as Gtk
-import qualified GI.Gdk as Gdk
-import qualified GI.Gio as Gio
-import qualified GI.GLib as GLib
-import qualified Data.Text as Text
-import qualified Data.Map as Map
 
 import qualified NetworkService
 
-import Data.Text (Text, pack, unpack)
+import Data.Text (pack)
 import Control.Concurrent.Async (waitCatch)
-import Data.Maybe (fromMaybe, fromJust)
-import Data.IORef
+import Data.Maybe ( fromJust)
 import Lens.Micro
 import Data.Foldable (for_)
 import Data.Map ((!?))
@@ -42,7 +36,7 @@ showGameScreen app sessionId initialState = do
   statusLabel <- builderGetObject Gtk.Label builder "status-label"
   restartButton <- builderGetObject Gtk.Button builder "restart-button"
 
-  Gtk.onButtonClicked restartButton $ do
+  _ <- Gtk.onButtonClicked restartButton $ do
     showStartScreen app
     Gtk.windowClose window
 
@@ -72,7 +66,7 @@ renderField sessionId field statusLabel restartButton = do
     let mCell = cells !? point
     cellButton <- makeCellButton mCell
 
-    Gtk.onButtonClicked cellButton $ do
+    _ <- Gtk.onButtonClicked cellButton $ do
       let req = NetworkService.move sessionId i j
       asyncRequest req $ \aGameState -> do
         mGameState <- waitCatch aGameState
@@ -134,8 +128,8 @@ renderButtons field grid = do
         Nothing -> ""
 
 makeCellButton :: Maybe Cell -> IO Gtk.Button
-makeCellButton cell =
+makeCellButton mCell =
   Gtk.buttonNewWithLabel $ 
-    case cell of
+    case mCell of
       Just cell -> pack $ show cell
       Nothing -> ""

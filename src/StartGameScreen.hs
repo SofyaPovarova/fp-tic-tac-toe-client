@@ -6,16 +6,11 @@ module StartGameScreen
   ) where
 
 import qualified GI.Gtk as Gtk
-import qualified GI.Gdk as Gdk
-import qualified GI.Gio as Gio
-import qualified GI.GLib as GLib
-import qualified Data.Text as Text
 
 import qualified NetworkService
 
-import Data.Text (Text, pack, unpack)
+import Data.Text (pack)
 import Control.Concurrent.Async (waitCatch)
-import Data.Maybe (fromMaybe)
 import Data.IORef
 import GHC.Float
 
@@ -32,7 +27,6 @@ showStartScreen app = do
 
   window <- builderGetObject Gtk.Window builder "window"
   fieldSizePicker <- builderGetObject Gtk.SpinButton builder "field-size-picker"
-  roleButtonGroup <- builderGetObject Gtk.ButtonBox builder "role-button-group"
   buttonRoleCrosses <- builderGetObject Gtk.RadioButton builder "button-role-crosses"
   buttonRoleNoughts <- builderGetObject Gtk.RadioButton builder "button-role-noughts"
   buttonRoleRandom <- builderGetObject Gtk.RadioButton builder "button-role-random"
@@ -45,7 +39,7 @@ showStartScreen app = do
   setChangeRoleCallback buttonRoleNoughts (PlayerRoleParam O) roleRef
   setChangeRoleCallback buttonRoleRandom (PlayerRoleRandom) roleRef
 
-  Gtk.onButtonClicked startGameButton $ do
+  _ <- Gtk.onButtonClicked startGameButton $ do
     Gtk.widgetSetSensitive startGameButton False
     fieldSizeValue <- Gtk.spinButtonGetValue fieldSizePicker
     role <- readIORef roleRef

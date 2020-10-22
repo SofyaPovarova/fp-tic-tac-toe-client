@@ -4,11 +4,9 @@ module Utils where
 
 import qualified GI.Gtk as Gtk
 import qualified GI.Gdk as Gdk
-import qualified GI.Gio as Gio
 import qualified GI.GLib as GLib
-import qualified Data.Text as Text
 
-import Data.Text (Text, pack, unpack)
+import Data.Text (pack)
 import Data.Word (Word32)
 import Data.Maybe (fromJust)
 import Control.Concurrent (forkIO)
@@ -42,10 +40,12 @@ builderGetObject objectTypeClass builder objectId =
   fromJust <$> Gtk.builderGetObject builder (pack objectId) >>=
     Gtk.unsafeCastTo objectTypeClass
 
-doOnMainThread block =
-  GLib.idleAdd GLib.PRIORITY_HIGH_IDLE $ do
+doOnMainThread :: IO () -> IO ()
+doOnMainThread block = do
+  _ <- GLib.idleAdd GLib.PRIORITY_HIGH_IDLE $ do
     block
     return False
+  return ()
     
 doAsync :: IO () -> IO ()
 doAsync block = forkIO block >> return ()

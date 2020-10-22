@@ -21,7 +21,6 @@ instance Show PlayerRoleParam where
   show (PlayerRoleParam cell) = show cell
   show PlayerRoleRandom = "random"
   
-
 data Cell = X | O
   deriving (Eq, Generic)
 
@@ -54,13 +53,6 @@ instance FromJSON GameResult where
       "draw" -> pure Draw
       _ -> fail $ "Unknown GameResult value"
 
-toGameResult :: Cell -> GameResult
-toGameResult =
-  \case
-    X -> CrossesWin
-    O -> NoughtsWin
-
-
 data Field = Field
   { _fieldCells :: Map.Map (Int, Int) Cell
   , _fieldSize :: Int
@@ -86,8 +78,3 @@ instance FromJSON GameState where
     _gsField <- o .: "field"
     _gsGameResult <- o .: "gameResult"
     return GameState{..}
-    
-data SessionState = SessionState 
-  { stateSessionId :: Maybe SessionId
-  , stateGameSession :: GameState
-  }
