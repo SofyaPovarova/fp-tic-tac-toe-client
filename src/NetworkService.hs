@@ -14,7 +14,7 @@ import Models
 baseUrl :: String
 baseUrl = "http://localhost:8081"
 
-startGame :: Int -> PlayerRoleParam -> Int -> IO (Either String (SessionId, GameSession))
+startGame :: Int -> PlayerRoleParam -> Int -> IO (Either String (SessionId, GameState))
 startGame fieldSize role winLineLength = do
   let opts = defaults & param "fieldSize" .~ [pack $ show fieldSize] 
                       & param "role" .~ [pack $ show role] 
@@ -24,13 +24,13 @@ startGame fieldSize role winLineLength = do
 
   let body = result ^. responseBody
   let sessionHeader = BS.unpack $ result ^. responseHeader "Session"
-  let decodedBody = decode body :: Maybe GameSession
+  let decodedBody = decode body :: Maybe GameState
   
   return $ case decodedBody of
     Just session -> Right $ (sessionHeader, session)
     Nothing -> Left $ "request to /startGame failed with code " ++ (show $ result^.responseStatus.statusCode)
   
-move :: SessionId -> Int -> Int -> IO (Either String GameSession)
+move :: SessionId -> Int -> Int -> IO (Either String GameState)
 move sessionId x y = do
   let opts = defaults & param "x" .~ [pack $ show x]
                       & param "y" .~ [pack $ show y]
@@ -39,8 +39,8 @@ move sessionId x y = do
   result <- postWith opts (baseUrl ++ "/move") (BS.pack "")
 
   let body = result ^. responseBody
-  let decodedBody = decode body :: Maybe GameSession
+  let decodedBody = decode body :: Maybe GameState
 
   return $ case decodedBody of
-    Just session -> Right session
+    Just state -> Right state
     Nothing -> Left $ "request to /move failed with code " ++ (show $ result^.responseStatus.statusCode)

@@ -1,7 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module StartGameScreen where
+module StartGameScreen 
+  ( showStartScreen
+  ) where
 
 import qualified GI.Gtk as Gtk
 import qualified GI.Gdk as Gdk
@@ -21,8 +23,8 @@ import Models
 import Utils
 import GameScreen
 
-showStartScreen :: IO ()
-showStartScreen = do
+showStartScreen :: Gtk.Application -> IO ()
+showStartScreen app = do
   setupStyles "res/login-screen.css"
 
   let gladeFile = "res/login-screen.glade"
@@ -54,7 +56,7 @@ showStartScreen = do
       doOnMainThread $ do
         case mSession of
           Right (Right (sessionId, initialState)) -> do
-            showGameScreen sessionId initialState
+            showGameScreen app sessionId initialState
             Gtk.windowClose window
           Right (Left err) -> putStrLn $ "err: " ++ show err
           Left err -> putStrLn $ "err: " ++ show err
@@ -62,6 +64,7 @@ showStartScreen = do
       return ()
 
   Gtk.widgetShowAll window
+  Gtk.applicationAddWindow app window
 
 setChangeRoleCallback :: Gtk.RadioButton -> PlayerRoleParam -> IORef PlayerRoleParam -> IO ()
 setChangeRoleCallback button role ref = do

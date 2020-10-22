@@ -74,20 +74,20 @@ instance FromJSON Field where
     _fieldSize <- o .: "size"
     return Field{..}
 
-data GameSession = GameSession
+data GameState = GameState 
   { _gsField :: Field
   , _gsGameResult :: Maybe GameResult
   } deriving (Show)
 
-makeLenses ''GameSession
+makeLenses ''GameState
 
-instance FromJSON GameSession where
-  parseJSON = withObject "GameSession" $ \o -> do
+instance FromJSON GameState where
+  parseJSON = withObject "GameState" $ \o -> do
     _gsField <- o .: "field"
     _gsGameResult <- o .: "gameResult"
-    return GameSession{..}
+    return GameState{..}
     
 data SessionState = SessionState 
   { stateSessionId :: Maybe SessionId
-  , stateGameSession :: GameSession
+  , stateGameSession :: GameState
   }
