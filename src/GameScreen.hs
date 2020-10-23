@@ -12,13 +12,11 @@ import qualified NetworkService
 
 import Data.Text (pack)
 import Control.Concurrent.Async (waitCatch)
-import Data.Maybe ( fromJust)
+import Data.Maybe (fromJust)
 import Lens.Micro
 import Data.Foldable (for_)
 import Data.Map ((!?))
 import Data.Int (Int32)
-import Network.HTTP.Client
-import Control.Exception
 
 import Models
 import Utils
@@ -26,8 +24,6 @@ import {-# SOURCE #-} StartGameScreen
 
 showGameScreen :: Gtk.Application -> String -> GameState -> IO ()
 showGameScreen app sessionId initialState = do
-  setupStyles "res/game-screen.css"
-
   let gladeFile = "res/game-screen.glade"
   builder <- Gtk.builderNewFromFile (pack gladeFile)
 
@@ -73,15 +69,7 @@ renderField sessionId field statusLabel restartButton = do
         doOnMainThread $
           case mGameState of
             Right gameState -> renderGameState grid statusLabel restartButton gameState
-            Left e -> do
-              Gtk.labelSetLabel statusLabel $ pack $ 
-                case (fromException e) of
-                  Just (HttpExceptionRequest _ content) -> 
-                    case content of 
-                      StatusCodeException _ errText -> "Error: " ++ show errText
-                      ConnectionFailure e' -> show e'
-                      _ -> show e
-                  _ -> show e
+            Left e -> setErrorLabel statusLabel e
         return ()
 
     Gtk.gridAttach
